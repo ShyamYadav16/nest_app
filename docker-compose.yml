@@ -1,0 +1,41 @@
+version: '3.3'
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    env_file:
+      - ./.env
+    volumes:
+      - .:/app
+      - '/app/node_modules'
+    depends_on:
+      - mysql_server
+    networks:
+      - app-tier
+
+  mysql_server:
+    image: mysql:5.7
+    expose:
+      - 3306
+    environment:
+      - MYSQL_DATABASE=data
+      - MYSQL_USER=shyam
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_TCP_PORT=3306
+      - MYSQL_ROOT_HOST=%
+    ports:
+      - 3306:3306
+    networks:
+      - app-tier
+
+networks:
+  app-tier:
