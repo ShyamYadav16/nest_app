@@ -36,6 +36,11 @@ services:
       - 3306:3306
     networks:
       - app-tier
+    volumes:
+       - mysql_volume:/var/lib/mysql
+
+volumes:
+  mysql_volume:
 
 networks:
   app-tier:
