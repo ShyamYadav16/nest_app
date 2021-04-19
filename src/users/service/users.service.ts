@@ -10,19 +10,15 @@ import {LoginUserDto} from "../models/dto/LoginUser.dto";
 @Injectable()
 export class UsersService {
 
-  // private users: any = [{id: 1}];
-  //
-  // findAll() {
-  //   return this.users;
-  // }
-  //
-  //
-
   constructor(
     @InjectRepository(Users)
     private userRepository: Repository<Users>,
     private authService: AuthService
   ) {}
+
+  async findAll(): Promise<UserI[]> {
+    return await this.userRepository.find();
+  }
 
   async create(createdUserDto: CreateUserDto): Promise<UserI> {
     if(await this.mailExists(createdUserDto.email)) {
@@ -43,13 +39,18 @@ export class UsersService {
     if(user) {
       const isPasswordMatches = await this.validatePassword(loginUserDto.password, user.password);
       if (isPasswordMatches) {
-        return 'Login was successful';
+        const u = await this.findOne(user.id);
+        return await this.authService.generateJwt(u);
       } else {
         throw new HttpException('Email/Password combination is wrong', HttpStatus.UNAUTHORIZED);
       }
     } else {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+  }
+
+  async findOne(id: number): Promise<UserI> {
+    return await this.userRepository.findOne(id);
   }
 
   private async findUserByEmail(email: string): Promise<UserI> {

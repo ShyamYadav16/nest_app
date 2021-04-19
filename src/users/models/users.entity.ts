@@ -12,7 +12,7 @@ export class Users {
   @Column({unique: true})
   email: string;
 
-  @Column()
+  @Column({select: false})
   password: string;
 
   @BeforeInsert()
